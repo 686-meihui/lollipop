@@ -1,0 +1,313 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Big Red Lollipop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one centered column, a numbered question rail on top, teacher bubble, then the student's notebook line and tile tray. */
+:root{
+  --bg:#F2F5F1; --surface:#FFFFFF; --fg:#1C2420; --muted:#5A6962; --line:#D5DDD7;
+  --red:#CF2A40; --red-tint:#FCE6E9; --green:#17855A; --green-tint:#DDF3E8; --pop-white:#FFFFFF;
+  --mark:#FFE9A8;
+  --display:"Fredoka","Nunito","Noto Sans TC",system-ui,sans-serif;
+  --body:"Nunito","Noto Sans TC",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --surface:#1B211E; --fg:#EAF0EC; --muted:#9BAAA2; --line:#2F3A35;
+    --red:#FF6F82; --red-tint:#3A1E24; --green:#4FCB8C; --green-tint:#16322A; --pop-white:#EDEDED;
+    --mark:#5B4A12; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1B211E; --fg:#EAF0EC; --muted:#9BAAA2; --line:#2F3A35;
+  --red:#FF6F82; --red-tint:#3A1E24; --green:#4FCB8C; --green-tint:#16322A; --pop-white:#EDEDED;
+  --mark:#5B4A12; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:500 16px/1.55 var(--body);margin:0;
+  padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pop{position:relative;width:46px;height:46px;flex:none;border-radius:50%;
+  background:repeating-conic-gradient(var(--red) 0 30deg,var(--pop-white) 0 60deg);box-shadow:inset 0 0 0 3px var(--red)}
+.pop::after{content:"";position:absolute;left:50%;top:100%;width:5px;height:22px;margin-left:-2.5px;background:var(--muted);border-radius:0 0 3px 3px}
+.title{flex:1;min-width:180px}
+.title h1{font:600 28px/1.1 var(--display);margin:0;letter-spacing:.2px}
+.title p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.toggles{display:flex;gap:8px;flex-wrap:wrap}
+.tg{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:700}
+.tg[aria-pressed="true"]{border-color:var(--green);background:var(--green-tint)}
+
+.rail{display:flex;gap:8px;flex-wrap:wrap}
+.dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--surface);font-weight:800;font-variant-numeric:tabular-nums}
+.dot.done{background:var(--green-tint);border-color:var(--green)}
+.dot.cur{border-color:var(--red);background:var(--red-tint)}
+
+.card{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:16px}
+.label{font:600 13px var(--display);letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:0 0 6px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.topic{color:var(--red)}
+.q{font:600 24px/1.35 var(--display);margin:0;text-wrap:balance}
+mark{background:var(--mark);color:inherit;border-radius:4px;padding:0 3px}
+.zh{color:var(--muted);margin:6px 0 0;font-size:15px}
+.say{border:2px solid var(--line);background:var(--bg);border-radius:999px;padding:3px 12px;font-size:14px;font-weight:700}
+
+.echo{background:var(--bg);border-radius:12px;padding:10px 12px;font-size:15px;margin:0}
+.opts{display:grid;gap:10px;margin-top:10px}
+.opt{text-align:left;font:700 20px var(--body);padding:14px 16px;border-radius:14px;border:2px solid var(--line);background:var(--surface);box-shadow:0 3px 0 var(--line)}
+.opt.no{border-color:var(--red);background:var(--red-tint)}
+.opt.yes{border-color:var(--green);background:var(--green-tint)}
+
+.ans{min-height:76px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:14px;border-radius:14px;border:2px dashed var(--line);background:var(--bg)}
+.ans .ph{color:var(--muted);align-self:center}
+.pool{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;min-height:56px}
+.tile{font:800 21px/1.2 var(--body);padding:10px 14px;border-radius:12px;border:2px solid var(--line);background:var(--surface);box-shadow:0 3px 0 var(--line);min-height:48px}
+.tile.p{min-width:48px;padding-inline:10px;text-align:center}
+.tile.bad{border-color:var(--red);background:var(--red-tint);box-shadow:0 3px 0 var(--red)}
+.tile.ok{border-color:var(--green);background:var(--green-tint);box-shadow:0 3px 0 var(--green)}
+.tile.hint{border-color:var(--red);animation:pulse 1s ease-in-out infinite}
+.tile.used{visibility:hidden}
+@keyframes pulse{50%{transform:translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){.tile.hint{animation:none;background:var(--mark)}}
+
+.msg{margin:0;min-height:24px;font-weight:700}
+.msg.bad{color:var(--red)} .msg.good{color:var(--green)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 18px;font-weight:800;box-shadow:0 3px 0 var(--line)}
+.btn.main{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.btn.go{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+:root[data-theme="dark"] .btn.main,:root[data-theme="dark"] .btn.go{color:#101412}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.main,:root:not([data-theme="light"]) .btn.go{color:#101412}}
+.done-sentence{font:600 24px/1.4 var(--display);margin:0;color:var(--green)}
+.read{margin:8px 0 0;font-weight:700}
+
+.sum{display:flex;flex-direction:column;gap:10px}
+.row{display:grid;grid-template-columns:2.2rem 1fr auto;gap:4px 12px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .n{font:600 20px var(--display);color:var(--red)}
+.row .a{grid-column:2 / 4;min-width:0;overflow-wrap:anywhere}
+.stars{color:var(--red);letter-spacing:2px;white-space:nowrap}
+.big{font:600 32px var(--display);margin:0}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="pop" aria-hidden="true"></div>
+    <div class="title"><h1>Big Red Lollipop</h1><p>老師問・我來答　先找答句開頭，再排出完整句子</p></div>
+    <div class="toggles">
+      <button class="tg" id="tgZh" aria-pressed="true">中文提示</button>
+      <button class="tg" id="tgCap" aria-pressed="true">自己加大寫</button>
+    </div>
+  </header>
+  <nav class="rail" id="rail" aria-label="題目"></nav>
+  <main id="app"></main>
+</div>
+
+<script>
+var Q=[
+{topic:"Genre 文體",q:"What is the genre of this text? How do you know?",zh:"這篇文章的文體是什麼？你怎麼知道的？",hl:"the genre",
+ note:"問句 What is <b>the genre</b>… → 答句開頭用 <b>The genre is</b> …",starter:"The genre is",bad:["The setting is","I think the author"],
+ sets:[{parts:["the genre","is","realistic fiction","because","characters","act","like","real people","."],scr:["realistic fiction",".","the genre","is","because","act","characters","real people","like"],zh:"文體是寫實小說，因為裡面的角色表現得像真實的人。"}]},
+{topic:"Point of View 敘事視角",q:"What point of view is this story told from?",zh:"這個故事是用什麼視角來說的？",hl:"told from",
+ note:"問句 is this story <b>told from</b> → 答句開頭用 <b>The story is told from</b> …",starter:"The story is told from",bad:["The genre is","The topic is about"],
+ sets:[{parts:["the story","is","told","from","the","first-person","point of view","."],scr:["from","told","point of view","first-person","the","is","the story","."],zh:"這個故事是以第一人稱的視角來敘述的。"}]},
+{topic:"Disagreements 解決爭執",q:"How can people work out disagreements?",zh:"人們可以怎樣解決爭執？",hl:"people work out disagreements",
+ note:"問句 How can <b>people</b> work out… → 答句開頭用 <b>People can work out</b> …（How 問方法，用 by 回答）",starter:"People can work out",bad:["It means to","Yes, I"],
+ sets:[{parts:["people","can","work out","disagreements","by","compromising","."],scr:["compromising","work out","by","people","disagreements","can","."],zh:"人們可以透過妥協來解決爭執。"}]},
+{topic:"Idiom 片語含義",q:"What does it mean when people say, “Let’s meet in the middle?”",zh:"當人們說 “Let’s meet in the middle” 是什麼意思？",hl:"it mean",
+ note:"問句 What does <b>it mean</b>… → 答句開頭用 <b>It means</b> …",starter:"It means to",bad:["People can","The topic is"],
+ sets:[{parts:["it","means","to","compromise","where","both sides","give up","a little","."],scr:["give up","to","means","a little","it","both sides","compromise","where","."],zh:"意思是雙方各讓一點，達成妥協。"}]},
+{topic:"Personal Connection 個人經驗",q:"Have you hurt your friend’s feelings before? How did you become friends again?",zh:"你以前傷過朋友的心嗎？你們後來怎麼和好的？",hl:"Have you",
+ note:"問句 <b>Have you</b>…? 是 Yes/No 問句 → 答句先說 <b>Yes, I</b> … 或 <b>No, I</b> …",starter:"Yes, I",bad:["The story is","They can"],
+ sets:[{parts:["yes",",","I","said","sorry","and","shared","my","snack","."],scr:["I","sorry","said","shared","and","snack","my",",","yes","."],zh:"是的，我說了對不起，也分享了我的點心。"}]},
+{topic:"Central Idea 中心主旨",q:"What is the central idea of the text?",zh:"這篇文章的中心主旨是什麼？",hl:"the central idea",
+ note:"問句 What is <b>the central idea</b>… → 答句開頭用 <b>The central idea is that</b> …",starter:"The central idea is that",bad:["The topic is about","The genre is"],
+ sets:[{parts:["the central idea","is that","compromise","and","empathy","solve","problems","."],scr:["solve","empathy","and","problems","compromise","the central idea","is that","."],zh:"中心主旨是妥協與同理心可以解決問題。"}]},
+{topic:"Setting 故事背景",q:"What is the setting of the story?",zh:"這個故事的背景是什麼？",hl:"the setting",
+ note:"問句 What is <b>the setting</b>… → 答句開頭用 <b>The story takes place at</b> …（地點用 at）",starter:"The story takes place at",bad:["The main characters are","The story is told from"],
+ sets:[{parts:["The story","takes place","at","Rubina's house","and","Sally's party","."],scr:["at","takes place","Sally's party","and","Rubina's house","The story","."],zh:"故事發生在 Rubina 的家和 Sally 的派對。"}]},
+{topic:"Author’s Purpose 寫作目的",q:"What is the author’s purpose for writing this text? How do you know?",zh:"作者寫這篇文章的目的是什麼？你怎麼知道的？",hl:"author’s purpose",
+ note:"問句 What is <b>the author’s purpose</b>… → 答句開頭用 <b>The author’s purpose is to</b> …",starter:"The author’s purpose is to",bad:["The topic is about","The central idea is that"],
+ sets:[{parts:["The author's purpose","is","to entertain","readers","with","a funny story","."],scr:["a funny story","with","to entertain","is","The author's purpose","readers","."],zh:"作者的目的是用一個有趣的故事來娛樂讀者。"}]},
+{topic:"Topic 文章主題",q:"What is the topic of this text? How do you know?",zh:"這篇文章的主題是什麼？你怎麼知道的？",hl:"the topic",
+ note:"問句 What is <b>the topic</b>… → 答句開頭用 <b>The topic is about</b> …",starter:"The topic is about",bad:["The author’s purpose is to","The story takes place at"],
+ sets:[{parts:["The topic","is","about","compromise","and","sisters","getting along","."],scr:["sisters","getting along","is","The topic","about","and","compromise","."],zh:"這個主題是關於妥協以及姊妹之間的相處。"}]},
+{topic:"Plot 情節發展",q:"What happens at the beginning, middle, and end of the story?",zh:"故事的開頭、中間和結尾發生了什麼事？",hl:"beginning, middle, and end",
+ note:"問句 at the <b>beginning, middle, and end</b> → 答句分三句：<b>At the beginning,</b> … <b>In the middle,</b> … <b>In the end,</b> …",starter:"At the beginning,",bad:["The main characters are","The story takes place at"],
+ sets:[
+  {parts:["At the beginning",",","Sana","eats","Rubina's red lollipop","."],scr:["eats","Rubina's red lollipop",".","Sana","At the beginning",","],zh:"一開始，Sana 吃了 Rubina 的紅色棒棒糖。"},
+  {parts:["In the middle",",","Sana","is invited","to a party","."],scr:["to a party","is invited",".","In the middle","Sana",","],zh:"中間，Sana 被邀請去參加派對。"},
+  {parts:["In the end",",","Sana","gives","Rubina","a green lollipop","."],scr:["gives","a green lollipop","In the end","Rubina","Sana",",","."],zh:"最後，Sana 給了 Rubina 一支綠色棒棒糖。"}]},
+{topic:"Main Characters 主要角色",q:"Who are the main characters in the story?",zh:"故事中的主要角色是誰？",hl:"the main characters",
+ note:"問句 Who are <b>the main characters</b>… → 答句開頭用 <b>The main characters are</b> …",starter:"The main characters are",bad:["The topic is about","Yes, I"],
+ sets:[{parts:["the main","characters","are","Rubina",",","Sana",",","and","Ami","."],scr:["and","the main","characters","Rubina",",","are","Sana",",","Ami","."],zh:"主要角色是 Rubina、Sana 和 Ami。"}]}
+];
+
+var KEY="bigRedLollipopStars";
+var S={view:"q",qi:0,set:0,phase:"starter",placed:[],caps:false,hints:0,wrong:0,sWrong:0,
+  showZh:true,capMode:true,res:[0,0,0,0,0,0,0,0,0,0,0],msg:"",msgType:"",bad:[],hintId:null,sPick:null};
+try{var saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&saved.length===Q.length)S.res=saved;}catch(e){}
+
+function cap(t){return t.charAt(0).toUpperCase()+t.slice(1);}
+function sentence(parts){var p=parts.slice();p[0]=cap(p[0]);return p.join(" ").replace(/\s+([.,])/g,"$1");}
+function fullAnswer(q){return q.sets.map(function(s){return sentence(s.parts);}).join(" ");}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function markHL(text,hl){
+  var i=text.toLowerCase().indexOf(hl.toLowerCase());
+  if(i<0)return esc(text);
+  return esc(text.slice(0,i))+"<mark>"+esc(text.slice(i,i+hl.length))+"</mark>"+esc(text.slice(i+hl.length));
+}
+function speak(t){try{var u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
+function hasSpeech(){try{return "speechSynthesis" in window;}catch(e){return false;}}
+function stars(n){return "★".repeat(n)+"☆".repeat(3-n);}
+
+function startQ(i){
+  S.view="q";S.qi=i;S.set=0;S.phase="starter";S.placed=[];S.caps=false;S.hints=0;S.wrong=0;S.sWrong=0;
+  S.msg="";S.msgType="";S.bad=[];S.hintId=null;S.sPick=null;render();window.scrollTo(0,0);
+}
+function nextSet(){S.set++;S.phase="build";S.placed=[];S.caps=false;S.msg="";S.bad=[];S.hintId=null;render();}
+function finishQ(){
+  var n=3;if(S.sWrong>0)n--;if(S.hints>0||S.wrong>0)n--;n=Math.max(n,1);
+  S.res[S.qi]=n;try{localStorage.setItem(KEY,JSON.stringify(S.res));}catch(e){}
+  if(S.qi<Q.length-1)startQ(S.qi+1);else{S.view="sum";render();window.scrollTo(0,0);}
+}
+
+function check(){
+  var st=Q[S.qi].sets[S.set],n=st.parts.length;
+  S.hintId=null;
+  if(S.placed.length<n){S.msg="還有字卡沒有用到喔。";S.msgType="bad";S.bad=[];render();return;}
+  var bad=[];
+  S.placed.forEach(function(id,i){
+    var got=st.scr[id],exp=st.parts[i];
+    if(i===0){if(cap(got)!==cap(exp))bad.push(i);}else if(got!==exp)bad.push(i);
+  });
+  if(!bad.length&&S.capMode&&!S.caps){
+    var f=st.scr[S.placed[0]];
+    if(f.charAt(0)!==f.charAt(0).toUpperCase()){S.wrong++;S.bad=[0];S.msg="順序對了！句首的字母要大寫，請按 Aa。";S.msgType="bad";render();return;}
+  }
+  if(bad.length){S.wrong++;S.bad=bad;S.msg="紅色的字卡位置不對，再想想看。";S.msgType="bad";render();return;}
+  S.bad=[];S.phase="done";S.msg="答對了！";S.msgType="good";render();
+}
+function hint(){
+  var st=Q[S.qi].sets[S.set],k=S.placed.length;
+  var wrongPos=[];
+  S.placed.forEach(function(id,i){if(cap(st.scr[id])!==cap(st.parts[i]))wrongPos.push(i);});
+  S.hints++;
+  if(wrongPos.length){S.bad=wrongPos;S.hintId=null;S.msg="紅色的字卡放錯了，點它把它放回去。";S.msgType="bad";render();return;}
+  if(k>=st.parts.length){S.msg="字卡都用完了，按「檢查」看看。";S.msgType="";render();return;}
+  var want=st.parts[k],found=null;
+  st.scr.forEach(function(t,i){if(found===null&&S.placed.indexOf(i)<0&&cap(t)===cap(want))found=i;});
+  S.bad=[];S.hintId=found;S.msg="閃動的字卡是下一個。";S.msgType="";render();
+}
+
+function railHTML(){
+  return Q.map(function(q,i){
+    var c="dot"+(S.res[i]>0?" done":"")+(S.view==="q"&&i===S.qi?" cur":"");
+    return '<button class="'+c+'" data-act="go" data-i="'+i+'" aria-label="第 '+(i+1)+' 題 '+q.topic+'">'+(i+1)+'</button>';
+  }).join("");
+}
+
+function qCard(q){
+  return '<section class="card"><p class="label"><span><span class="topic">'+(S.qi+1)+' / '+Q.length+'</span>　'+esc(q.topic)+'</span>'+
+    (hasSpeech()?'<button class="say" data-act="say">聽老師說</button>':'')+'</p>'+
+    '<p class="q">'+markHL(q.q,q.hl)+'</p>'+(S.showZh?'<p class="zh">'+esc(q.zh)+'</p>':'')+'</section>';
+}
+
+function starterHTML(q){
+  var opts=[q.starter].concat(q.bad),r=S.qi%3;
+  opts=opts.slice(r).concat(opts.slice(0,r));
+  var h='<section class="card"><p class="label"><span>第 1 步：哪一個是答句的開頭？</span></p>'+
+    '<p class="echo">看看老師問題裡<mark>標色</mark>的字，答句開頭要回應它。</p><div class="opts">';
+  opts.forEach(function(o,i){
+    var c="opt";if(S.sPick===o)c+=(o===q.starter?" yes":" no");
+    h+='<button class="'+c+'" data-act="starter" data-o="'+esc(o).replace(/"/g,"&quot;")+'">'+esc(o)+' …</button>';
+  });
+  return h+'</div><p class="msg '+S.msgType+'" style="margin-top:10px">'+esc(S.msg)+'</p></section>';
+}
+
+function buildHTML(q){
+  var st=q.sets[S.set],done=S.phase==="done",pl=S.placed;
+  var h='<section class="card"><p class="label"><span>第 2 步：排出完整的答句'+(q.sets.length>1?'（第 '+(S.set+1)+' / '+q.sets.length+' 句）':'')+'</span>'+
+    (S.capMode&&!done?'<button class="tg" data-act="cap" aria-pressed="'+S.caps+'">Aa 句首大寫</button>':'')+'</p>'+
+    '<p class="echo">'+q.note+'</p>';
+  h+='<div class="ans" style="margin-top:10px">';
+  if(!pl.length)h+='<span class="ph">點下面的字卡，一張一張排在這裡</span>';
+  pl.forEach(function(id,i){
+    var t=st.scr[id];
+    if(i===0&&(done||!S.capMode||S.caps))t=cap(t);
+    var c="tile"+(/^[.,]$/.test(t)?" p":"")+(done?" ok":"")+(S.bad.indexOf(i)>=0?" bad":"");
+    h+='<button class="'+c+'" data-act="unplace" data-i="'+i+'"'+(done?" disabled":"")+'>'+esc(t)+'</button>';
+  });
+  h+='</div>';
+  if(!done){
+    h+='<div class="pool">';
+    st.scr.forEach(function(t,id){
+      var used=pl.indexOf(id)>=0;
+      var c="tile"+(/^[.,]$/.test(t)?" p":"")+(used?" used":"")+(S.hintId===id?" hint":"");
+      h+='<button class="'+c+'" data-act="place" data-id="'+id+'"'+(used?" tabindex=\"-1\" aria-hidden=\"true\"":"")+'>'+esc(t)+'</button>';
+    });
+    h+='</div><p class="msg '+S.msgType+'" style="margin-top:10px">'+esc(S.msg)+'</p>'+
+      '<div class="actions"><button class="btn main" data-act="check">檢查</button><button class="btn" data-act="hint">提示</button><button class="btn" data-act="clear">重排</button></div>';
+  }else{
+    var last=S.set===q.sets.length-1;
+    h+='<p class="done-sentence" style="margin-top:14px">'+esc(sentence(st.parts))+'</p>'+
+      (S.showZh?'<p class="zh">'+esc(st.zh)+'</p>':'')+
+      '<p class="read">'+(hasSpeech()?'<button class="say" data-act="sayans">聽答句</button>　':'')+'現在大聲唸一次，像在回答老師一樣。</p>'+
+      (last&&q.sets.length>1?'<p class="echo" style="margin-top:10px">完整答句：'+esc(fullAnswer(q))+'</p>':'')+
+      '<div class="actions" style="margin-top:12px"><button class="btn go" data-act="next">'+(!last?'下一句':(S.qi<Q.length-1?'下一題':'看成績'))+'</button></div>';
+  }
+  return h+'</section>';
+}
+
+function sumHTML(){
+  var tot=S.res.reduce(function(a,b){return a+b;},0),max=Q.length*3;
+  var h='<section class="card"><p class="label"><span>練習成績</span></p><p class="big">'+tot+' / '+max+' <span class="stars">★</span></p>'+
+    '<p class="zh">每題最多 3 顆星：開頭選對、沒用提示、一次排對。</p>'+
+    '<div class="actions" style="margin-top:12px"><button class="btn main" data-act="redo">練習不到 3 顆星的題目</button><button class="btn" data-act="reset">全部重來</button></div></section>'+
+    '<section class="card sum"><p class="label"><span>全部答句</span></p>';
+  Q.forEach(function(q,i){
+    h+='<div class="row"><span class="n">'+(i+1)+'</span><span>'+esc(q.topic)+'</span><span class="stars">'+stars(S.res[i])+'</span><span class="a">'+esc(fullAnswer(q))+'</span></div>';
+  });
+  return h+'</section>';
+}
+
+function render(){
+  document.getElementById("rail").innerHTML=railHTML();
+  document.getElementById("tgZh").setAttribute("aria-pressed",S.showZh);
+  document.getElementById("tgCap").setAttribute("aria-pressed",S.capMode);
+  var app=document.getElementById("app");
+  if(S.view==="sum"){app.innerHTML=sumHTML();return;}
+  var q=Q[S.qi];
+  app.innerHTML='<div class="wrap">'+qCard(q)+(S.phase==="starter"?starterHTML(q):buildHTML(q))+'</div>';
+}
+
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-act]");if(!b)return;
+  var a=b.getAttribute("data-act"),q=Q[S.qi];
+  if(a==="go")startQ(+b.getAttribute("data-i"));
+  else if(a==="say")speak(q.q);
+  else if(a==="sayans")speak(sentence(q.sets[S.set].parts));
+  else if(a==="starter"){
+    var o=b.getAttribute("data-o");S.sPick=o;
+    if(o===q.starter){S.phase="build";S.msg="";S.sPick=null;S.msgType="";}
+    else{S.sWrong++;S.msg="再看看問句裡標色的字，答句開頭要回應它。";S.msgType="bad";}
+    render();
+  }
+  else if(a==="place"){var id=+b.getAttribute("data-id");if(S.placed.indexOf(id)<0){S.placed.push(id);}S.bad=[];S.hintId=null;S.msg="";S.msgType="";render();}
+  else if(a==="unplace"){var i=+b.getAttribute("data-i");S.placed.splice(i,1);if(!S.placed.length)S.caps=false;S.bad=[];S.hintId=null;S.msg="";S.msgType="";render();}
+  else if(a==="clear"){S.placed=[];S.caps=false;S.bad=[];S.hintId=null;S.msg="";S.msgType="";render();}
+  else if(a==="cap"){S.caps=!S.caps;render();}
+  else if(a==="check")check();
+  else if(a==="hint")hint();
+  else if(a==="next"){if(S.set<q.sets.length-1)nextSet();else finishQ();}
+  else if(a==="redo"){var k=S.res.findIndex(function(r){return r<3;});startQ(k<0?0:k);}
+  else if(a==="reset"){S.res=S.res.map(function(){return 0;});try{localStorage.removeItem(KEY);}catch(e){}startQ(0);}
+});
+document.getElementById("tgZh").addEventListener("click",function(){S.showZh=!S.showZh;render();});
+document.getElementById("tgCap").addEventListener("click",function(){S.capMode=!S.capMode;S.caps=false;render();});
+startQ(0);
+</script>
+
+</body></html>
