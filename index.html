@@ -1,5 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Big Red Lollipop</title>
+<title>Sentence Builder</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
@@ -95,18 +94,19 @@ mark{background:var(--mark);color:inherit;border-radius:4px;padding:0 3px}
 <div class="wrap">
   <header>
     <div class="pop" aria-hidden="true"></div>
-    <div class="title"><h1>Big Red Lollipop</h1><p>老師問・我來答　先找答句開頭，再排出完整句子</p></div>
+    <div class="title"><h1 id="h1">Big Red Lollipop</h1><p>老師問・我來答　先找答句開頭，再排出完整句子</p></div>
     <div class="toggles">
       <button class="tg" id="tgZh" aria-pressed="true">中文提示</button>
       <button class="tg" id="tgCap" aria-pressed="true">自己加大寫</button>
     </div>
   </header>
+  <nav class="toggles" id="lessons" aria-label="課程"></nav>
   <nav class="rail" id="rail" aria-label="題目"></nav>
   <main id="app"></main>
 </div>
 
 <script>
-var Q=[
+var L1=[
 {topic:"Genre 文體",q:"What is the genre of this text? How do you know?",zh:"這篇文章的文體是什麼？你怎麼知道的？",hl:"the genre",
  note:"問句 What is <b>the genre</b>… → 答句開頭用 <b>The genre is</b> …",starter:"The genre is",bad:["The setting is","I think the author"],
  sets:[{parts:["the genre","is","realistic fiction","because","characters","act","like","real people","."],scr:["realistic fiction",".","the genre","is","because","act","characters","real people","like"],zh:"文體是寫實小說，因為裡面的角色表現得像真實的人。"}]},
@@ -145,10 +145,100 @@ var Q=[
  sets:[{parts:["the main","characters","are","Rubina",",","Sana",",","and","Ami","."],scr:["and","the main","characters","Rubina",",","are","Sana",",","Ami","."],zh:"主要角色是 Rubina、Sana 和 Ami。"}]}
 ];
 
-var KEY="bigRedLollipopStars";
-var S={view:"q",qi:0,set:0,phase:"starter",placed:[],caps:false,hints:0,wrong:0,sWrong:0,
-  showZh:true,capMode:true,res:[0,0,0,0,0,0,0,0,0,0,0],msg:"",msgType:"",bad:[],hintId:null,sPick:null};
-try{var saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&saved.length===Q.length)S.res=saved;}catch(e){}
+var L2=[
+{topic:"Genre 文體",q:"What is the genre of this text? How do you know?",zh:"這篇文章的文體是什麼？你怎麼知道的？",hl:"the genre",
+ note:"問句 What is <b>the genre</b>… → 答句開頭用 <b>The genre is</b> …（這篇是資訊類文章 informational text，內容是真實的事實）",starter:"The genre is",bad:["The setting is","I think the author"],
+ sets:[{parts:["the genre","is","informational text","because","it","gives","facts","."],zh:"文體是資訊類文章，因為它提供事實。"}]},
+{topic:"Point of View 敘事視角",q:"What point of view is this story told from?",zh:"這個故事是用什麼視角來說的？",hl:"told from",
+ note:"問句 is this story <b>told from</b> → 答句開頭用 <b>This text is told from</b> …（作者一直對「you 你」說話）",starter:"This text is told from",bad:["The genre is","The topic is about"],
+ sets:[{parts:["this text","is","told","from","the","second-person","point of view","."],zh:"這篇文章是以第二人稱的視角來敘述的。"}]},
+{topic:"Central Idea 中心主旨",q:"What is the central idea of the text?",zh:"這篇文章的中心主旨是什麼？",hl:"the central idea",
+ note:"問句 What is <b>the central idea</b>… → 答句開頭用 <b>The central idea is that</b> …",starter:"The central idea is that",bad:["The topic is about","The genre is"],
+ sets:[{parts:["the central idea","is that","people","can","solve","conflicts","peacefully","."],zh:"中心主旨是人們可以和平地解決衝突。"}]},
+{topic:"Setting 背景",q:"What is the setting of the story?",zh:"這個故事的背景是什麼？",hl:"the setting",
+ note:"這是資訊類文章，沒有單一背景 → 答句用 <b>It takes place</b> …，說出時間（every day）和地點（at school…）",starter:"It takes place",bad:["The main characters are","The story is told from"],
+ sets:[{parts:["it","takes place","every day","at school",",","at home",",","and","on the playground","."],zh:"它發生在每一天，在學校、在家裡和在遊樂場。"}]},
+{topic:"Author’s Purpose 寫作目的",q:"What is the author’s purpose for writing this text? How do you know?",zh:"作者寫這篇文章的目的是什麼？你怎麼知道的？",hl:"author’s purpose",
+ note:"問句 What is <b>the author’s purpose</b>… → 答句開頭用 <b>The author’s purpose is to</b> …（P.I.E. 裡的 Inform）",starter:"The author’s purpose is to",bad:["The topic is about","The central idea is that"],
+ sets:[{parts:["the author's purpose","is","to inform","readers","about","solving conflicts","."],zh:"作者的目的是告訴讀者如何解決衝突。"}]},
+{topic:"Topic 文章主題",q:"What is the topic of this text? How do you know?",zh:"這篇文章的主題是什麼？你怎麼知道的？",hl:"the topic",
+ note:"問句 What is <b>the topic</b>… → 答句開頭用 <b>The topic is about</b> …",starter:"The topic is about",bad:["The author’s purpose is to","The story takes place at"],
+ sets:[{parts:["the topic","is","about","working with others","and","solving conflicts","."],zh:"主題是關於與他人合作以及解決衝突。"}]},
+{topic:"Text Structure 文章結構",q:"What happens at the beginning, middle, and end of the story?",zh:"故事的開頭、中間和結尾發生了什麼事？",hl:"beginning, middle, and end",
+ note:"問句 at the <b>beginning, middle, and end</b> → 答句分三句：<b>At the beginning,</b> … <b>In the middle,</b> … <b>In the end,</b> …",starter:"At the beginning,",bad:["The main characters are","The story takes place at"],
+ sets:[
+  {parts:["at the beginning",",","people","have","conflicts","and","feel","angry","."],zh:"一開始，人們有衝突並且覺得生氣。"},
+  {parts:["in the middle",",","people","learn","ways","to solve","conflicts","."],zh:"中間，人們學到解決衝突的方法。"},
+  {parts:["in the end",",","solving","conflicts","peacefully","takes","practice","."],zh:"最後，和平解決衝突需要練習。"}]},
+{topic:"Main Characters 主要人物",q:"Who are the main characters in the story?",zh:"故事中的主要角色是誰？",hl:"the main characters",
+ note:"小陷阱！資訊類文章沒有故事角色 → 答句用 <b>There are no</b> …，再說這篇寫的是真實的人",starter:"There are no",bad:["The main characters are","The topic is about"],
+ sets:[{parts:["there","are","no","characters","because","it","is","about","real people","."],zh:"沒有故事角色，因為它談論的是真實的人。"}]},
+{topic:"Details 細節題 1",q:"What do people do when conflicts make them angry?",zh:"當衝突讓人們生氣時，人們會做什麼？",hl:"people do",
+ note:"問句 What do <b>people</b> do… → 答句開頭用 <b>Some people</b> …，用逗號連接三件事",starter:"Some people",bad:["It means to","I think they"],
+ sets:[{parts:["some people","yell",",","some people","hit",",","and","some people","walk away","."],zh:"有些人大吼，有些人打人，有些人走開。"}]},
+{topic:"Details 細節題 2",q:"Why is it important to cool down when you feel angry?",zh:"生氣時，為什麼冷靜下來很重要？",hl:"is it important",
+ note:"問句 Why is <b>it important</b>… → 答句開頭用 <b>It is important to</b> …，Why 問原因，用 <b>because</b> 回答",starter:"It is important to",bad:["They can","The topic is about"],
+ sets:[{parts:["it","is","important","to cool down","because","yelling","makes","problems","worse","."],zh:"冷靜下來很重要，因為大吼會讓問題更糟。"}]},
+{topic:"Details 細節題 3",q:"What can people do to solve a conflict after they have calmed down?",zh:"冷靜下來之後，人們可以做什麼來解決衝突？",hl:"can people",
+ note:"問句 What <b>can people</b> do… → 答句開頭用 <b>People can</b> …，用逗號連接幾個動作",starter:"People can",bad:["It is important to","Some people"],
+ sets:[{parts:["people","can","talk",",","listen",",","and","ask an adult","for help","."],zh:"人們可以說出來、傾聽，並且請大人幫忙。"}]}
+];
+var L3=[
+{topic:"Genre 文體",q:"What is the genre of this text? How do you know?",zh:"這篇文章的文體是什麼？你怎麼知道的？",hl:"the genre",
+ note:"問句 What is <b>the genre</b>… → 答句開頭用 <b>The genre is</b> …（課本 Genre Study：Biographies tell about real people’s lives）",starter:"The genre is",bad:["The setting is","I think the author"],
+ sets:[{parts:["the genre","is","biography","because","it","tells","about","a real person","."],zh:"文體是傳記，因為它講述一個真實人物。"}]},
+{topic:"Point of View 敘事視角",q:"What point of view is this story told from?",zh:"這個故事是用什麼視角來說的？",hl:"told from",
+ note:"問句 is this story <b>told from</b> → 答句開頭用 <b>This story is told from</b> …（用 he、the baker 來說故事，是第三人稱）",starter:"This story is told from",bad:["The genre is","The topic is about"],
+ sets:[{parts:["this story","is","told","from","the","third-person","point of view","."],zh:"這個故事是以第三人稱的視角來敘述的。"}]},
+{topic:"Central Idea 中心主旨",q:"What is the central idea of the text?",zh:"這篇文章的中心主旨是什麼？",hl:"the central idea",
+ note:"問句 What is <b>the central idea</b>… → 答句開頭用 <b>The central idea is that</b> …",starter:"The central idea is that",bad:["The topic is about","The genre is"],
+ sets:[{parts:["the central idea","is that","people","can","help","their country","with","their skills","."],zh:"中心主旨是人們可以用自己的專長來幫助自己的國家。"}]},
+{topic:"Setting 故事背景",q:"What is the setting of the story?",zh:"這個故事的背景是什麼？",hl:"the setting",
+ note:"問句 What is <b>the setting</b>… → 答句開頭用 <b>The story takes place in</b> …，說出地點和時間",starter:"The story takes place in",bad:["The main characters are","The story is told from"],
+ sets:[{parts:["the story","takes place","in","Philadelphia","during","the American Revolution","."],zh:"故事發生在美國獨立戰爭時期的費城。"}]},
+{topic:"Author’s Purpose 寫作目的",q:"What is the author’s purpose for writing this text? How do you know?",zh:"作者寫這篇文章的目的是什麼？你怎麼知道的？",hl:"author’s purpose",
+ note:"問句 What is <b>the author’s purpose</b>… → 答句開頭用 <b>The author’s purpose is to</b> …（P.I.E. 裡的 Inform）",starter:"The author’s purpose is to",bad:["The topic is about","The central idea is that"],
+ sets:[{parts:["the author's purpose","is","to inform","readers","about","a baker","who","helped","America","."],zh:"作者的目的是告訴讀者一位幫助美國的麵包師傅的故事。"}]},
+{topic:"Topic 文章主題",q:"What is the topic of this text? How do you know?",zh:"這篇文章的主題是什麼？你怎麼知道的？",hl:"the topic",
+ note:"問句 What is <b>the topic</b>… → 答句開頭用 <b>The topic is about</b> …",starter:"The topic is about",bad:["The author’s purpose is to","The story takes place in"],
+ sets:[{parts:["the topic","is","about","a baker","and","the American Revolution","."],zh:"主題是關於一位麵包師傅和美國獨立戰爭。"}]},
+{topic:"Plot 情節發展",q:"What happens at the beginning, middle, and end of the story?",zh:"故事的開頭、中間和結尾發生了什麼事？",hl:"beginning, middle, and end",
+ note:"問句 at the <b>beginning, middle, and end</b> → 答句分三句：<b>At the beginning,</b> … <b>In the middle,</b> … <b>In the end,</b> …",starter:"At the beginning,",bad:["The main characters are","The story takes place in"],
+ sets:[
+  {parts:["at the beginning",",","the baker","makes","gingerbread","for","hungry children","."],zh:"一開始，麵包師傅為飢餓的孩子們做薑餅。"},
+  {parts:["in the middle",",","the baker","joins","General Washington","to help","the soldiers","."],zh:"中間，麵包師傅加入華盛頓將軍，去幫助士兵。"},
+  {parts:["in the end",",","the baker","persuades","the soldiers","to switch sides","."],zh:"最後，麵包師傅說服士兵們換到美國這一邊。"}]},
+{topic:"Main Characters 主要角色",q:"Who are the main characters in the story?",zh:"故事中的主要角色是誰？",hl:"the main characters",
+ note:"問句 Who are <b>the main characters</b>… → 答句開頭用 <b>The main characters are</b> …",starter:"The main characters are",bad:["The topic is about","Yes, I"],
+ sets:[{parts:["the main characters","are","the baker","and","General Washington","."],zh:"主要角色是麵包師傅和華盛頓將軍。"}]},
+{topic:"Details 細節題 1",q:"What does the baker do for the hungry children?",zh:"麵包師傅為飢餓的孩子們做了什麼？",hl:"the baker",
+ note:"問句 What does <b>the baker</b> do… → 答句開頭用代名詞 <b>He</b> …（the baker 換成 he，動詞加 s）",starter:"He gives",bad:["They can","The topic is about"],
+ sets:[{parts:["he","gives","them","broken pieces","of gingerbread","."],zh:"他給他們一些碎掉的薑餅。"}]},
+{topic:"Details 細節題 2",q:"Why does the baker want to help General Washington?",zh:"麵包師傅為什麼想幫助華盛頓將軍？",hl:"the baker want",
+ note:"問句 Why does <b>the baker want</b> to help… → 答句開頭用 <b>The baker wants to</b> …（does 後面的 want，回答時要加 s），Why 問原因，用 <b>because</b> 回答",starter:"The baker wants to",bad:["They want to","The topic is about"],
+ sets:[{parts:["the baker","wants","to help","General Washington","because","he","loves","his country","."],zh:"麵包師傅想幫助華盛頓將軍，因為他愛他的國家。"}]},
+{topic:"Details 細節題 3",q:"How does the baker persuade the soldiers to switch sides?",zh:"麵包師傅怎麼說服士兵們換邊？",hl:"the baker persuade",
+ note:"問句 How does <b>the baker persuade</b>… → 答句開頭用 <b>The baker tells</b> …（persuade 回答時要換成 tells）",starter:"The baker tells",bad:["They can","Some people"],
+ sets:[{parts:["the baker","tells","the soldiers","about","his bakeshop","and","his gingerbread","."],zh:"麵包師傅告訴士兵們他的麵包店和他的薑餅。"}]}
+];
+function shuffle(parts){
+  var a=parts.slice(),seed=parts.length*7+parts[0].length,tries=0;
+  function rnd(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
+  do{for(var i=a.length-1;i>0;i--){var j=Math.floor(rnd()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}tries++;}
+  while(a.join("|")===parts.join("|")&&tries<20);
+  return a;
+}
+[L2,L3].forEach(function(L){L.forEach(function(q){q.sets.forEach(function(s){if(!s.scr)s.scr=shuffle(s.parts);});});});
+var LESSONS=[{name:"Big Red Lollipop",key:"bigRedLollipopStars",Q:L1},{name:"Working with Others",key:"workingWithOthersStars",Q:L2},{name:"Gingerbread for Liberty",key:"gingerbreadForLibertyStars",Q:L3}];
+var Q=LESSONS[0].Q,KEY=LESSONS[0].key;
+var S={view:"q",li:0,qi:0,set:0,phase:"starter",placed:[],caps:false,hints:0,wrong:0,sWrong:0,
+  showZh:true,capMode:true,res:[],msg:"",msgType:"",bad:[],hintId:null,sPick:null};
+function loadRes(){
+  S.res=Q.map(function(){return 0;});
+  try{var saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&saved.length===Q.length)S.res=saved;}catch(e){}
+}
+function setLesson(i){S.li=i;Q=LESSONS[i].Q;KEY=LESSONS[i].key;loadRes();startQ(0);}
+loadRes();
 
 function cap(t){return t.charAt(0).toUpperCase()+t.slice(1);}
 function sentence(parts){var p=parts.slice();p[0]=cap(p[0]);return p.join(" ").replace(/\s+([.,])/g,"$1");}
@@ -274,6 +364,9 @@ function sumHTML(){
 }
 
 function render(){
+  document.getElementById("h1").textContent=LESSONS[S.li].name;
+  document.getElementById("lessons").innerHTML=LESSONS.map(function(l,i){
+    return '<button class="tg" data-act="lesson" data-i="'+i+'" aria-pressed="'+(i===S.li)+'">第 '+(i+1)+' 課　'+l.name+'</button>';}).join("");
   document.getElementById("rail").innerHTML=railHTML();
   document.getElementById("tgZh").setAttribute("aria-pressed",S.showZh);
   document.getElementById("tgCap").setAttribute("aria-pressed",S.capMode);
@@ -286,7 +379,8 @@ function render(){
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-act]");if(!b)return;
   var a=b.getAttribute("data-act"),q=Q[S.qi];
-  if(a==="go")startQ(+b.getAttribute("data-i"));
+  if(a==="lesson")setLesson(+b.getAttribute("data-i"));
+  else if(a==="go")startQ(+b.getAttribute("data-i"));
   else if(a==="say")speak(q.q);
   else if(a==="sayans")speak(sentence(q.sets[S.set].parts));
   else if(a==="starter"){
@@ -309,5 +403,3 @@ document.getElementById("tgZh").addEventListener("click",function(){S.showZh=!S.
 document.getElementById("tgCap").addEventListener("click",function(){S.capMode=!S.capMode;S.caps=false;render();});
 startQ(0);
 </script>
-
-</body></html>
